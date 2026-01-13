@@ -1,0 +1,12 @@
+# Pinned versions (recommend testing these in your environment)
+tensorflow==2.11.0
+numpy==1.24.0
+matplotlib==3.7.1
+pillow==9.5.0
+scikit-learn==1.2.2
+opencv-python==4.8.0.74
+seaborn==0.12.2
+tqdm==4.65.0
+streamlit==1.25.0
+ultralytics==8.0.20
+# Note: adjust versions to match your Python interpreter and platform (GPU vs CPU)

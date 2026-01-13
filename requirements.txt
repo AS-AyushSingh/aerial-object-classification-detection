@@ -1,0 +1,10 @@
+tensorflow>=2.11.0
+numpy
+matplotlib
+pillow
+scikit-learn
+opencv-python
+seaborn
+streamlit
+tqdm
+ultralytics  # optional, for YOLOv8 object detection
