@@ -81,3 +81,5 @@ streamlit run app.py
 
 - Legacy experiments were moved to `archive/` to keep the root clean.
 - Source dataset readme files are in `docs/dataset_sources/`.
+- The environment used by this editor may not allow pip installs; if package installs fail, run the install commands locally on your machine.
+- The notebook cells include guards that skip TF-dependent code if TensorFlow is not present — this allows inspection and visualization to run even when heavy packages are missing.
