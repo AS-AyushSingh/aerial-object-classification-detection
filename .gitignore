@@ -8,6 +8,8 @@ __pycache__/
 
 # Environments
 .venv/
+.venv311/
+.venv311_link_backup/
 venv/
 env/
 .env
@@ -26,7 +28,8 @@ Thumbs.db
 *.log
 *.tmp
 *.cache/
-results_dummy/
+reports/results_dummy/
+reports/evaluation/
 
 # Model artifacts
 *.pt
@@ -38,7 +41,7 @@ results_dummy/
 
 # Datasets (avoid pushing large data)
 classification_dataset/
-object_detection_Dataset/
+object_detection_dataset/
 
 # YOLO/Ultralytics cache
 runs/

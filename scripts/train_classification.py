@@ -1,24 +1,9 @@
 """
-train_classification.py
+Train image classification models (Bird vs Drone).
 
-Small, reusable script to train the classification models described in the notebook.
-Usage examples:
-  python train_classification.py --model custom --data_dir classification_dataset --epochs 10 --batch_size 32
-  python train_classification.py --model transfer --data_dir classification_dataset --epochs 10
-
-This script expects a directory structure:
-classification_dataset/
-  train/
-    bird/
-    drone/
-  valid/
-    bird/
-    drone/
-  test/
-    bird/
-    drone/
-
-It saves best model to `best_custom_cnn.h5` or `best_transfer_model.h5`.
+Usage examples from project root:
+    python scripts/train_classification.py --model custom --data_dir classification_dataset
+    python scripts/train_classification.py --model transfer --epochs 15
 """
 import argparse
 import sys
@@ -31,8 +16,6 @@ try:
 except Exception as e:
     print('TensorFlow is required to run this script. Install it and retry.\n', e)
     sys.exit(1)
-
-import numpy as np
 
 
 def build_custom_cnn(input_shape=(224,224,3), num_classes=2):
@@ -73,25 +56,33 @@ def build_transfer_model(input_shape=(224,224,3), num_classes=2):
 def main(args):
     img_size = (224,224)
     batch_size = args.batch_size
+    class_names = ['bird', 'drone']
+
+    for subset in ['train', 'valid', 'test']:
+        subset_path = os.path.join(args.data_dir, subset)
+        if not os.path.exists(subset_path):
+            raise FileNotFoundError(f'Missing dataset folder: {subset_path}')
 
     train_ds = tf.keras.preprocessing.image_dataset_from_directory(
         os.path.join(args.data_dir, 'train'),
-        image_size=img_size, batch_size=batch_size, label_mode='int')
+        image_size=img_size, batch_size=batch_size, label_mode='int', class_names=class_names)
     val_ds = tf.keras.preprocessing.image_dataset_from_directory(
         os.path.join(args.data_dir, 'valid'),
-        image_size=img_size, batch_size=batch_size, label_mode='int')
+        image_size=img_size, batch_size=batch_size, label_mode='int', class_names=class_names)
     test_ds = tf.keras.preprocessing.image_dataset_from_directory(
         os.path.join(args.data_dir, 'test'),
-        image_size=img_size, batch_size=batch_size, label_mode='int')
+        image_size=img_size, batch_size=batch_size, label_mode='int', class_names=class_names)
 
     if args.model == 'custom':
         model = build_custom_cnn(input_shape=img_size+(3,))
-        out_name = 'best_custom_cnn.h5'
+        out_name = os.path.join(args.out_dir, 'best_custom_cnn.h5')
         lr = 1e-3
     else:
         model = build_transfer_model(input_shape=img_size+(3,))
-        out_name = 'best_transfer_model.h5'
+        out_name = os.path.join(args.out_dir, 'best_transfer_model.h5')
         lr = 1e-3
+
+    os.makedirs(args.out_dir, exist_ok=True)
 
     model.compile(optimizer=keras.optimizers.Adam(lr), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     model.summary()
@@ -116,5 +107,6 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', default='classification_dataset')
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--batch_size', type=int, default=32)
+    parser.add_argument('--out_dir', default='artifacts/models')
     args = parser.parse_args()
     main(args)

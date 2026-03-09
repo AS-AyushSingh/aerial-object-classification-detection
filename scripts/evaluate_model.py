@@ -1,11 +1,8 @@
 """
-evaluate_model.py
+Evaluate a trained Keras classification model.
 
-Loads a saved Keras model (HDF5 or SavedModel), runs predictions on the test set, and writes a classification report and confusion matrix plot.
-Usage:
-  python evaluate_model.py --model_path best_custom_cnn.h5 --data_dir classification_dataset --out_dir results
-
-Requirements: tensorflow, scikit-learn, matplotlib, seaborn, numpy
+Usage from project root:
+    python scripts/evaluate_model.py --model_path artifacts/models/best_custom_cnn.h5
 """
 import argparse
 import os
@@ -28,7 +25,13 @@ def load_dataset(data_dir, subset='test', img_size=(224,224), batch_size=32):
     path = os.path.join(data_dir, subset)
     if not os.path.exists(path):
         raise FileNotFoundError(f'{path} not found')
-    ds = tf.keras.preprocessing.image_dataset_from_directory(path, image_size=img_size, batch_size=batch_size, label_mode='int')
+    ds = tf.keras.preprocessing.image_dataset_from_directory(
+        path,
+        image_size=img_size,
+        batch_size=batch_size,
+        label_mode='int',
+        class_names=['bird', 'drone']
+    )
     return ds
 
 
@@ -68,6 +71,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_path', required=True)
     parser.add_argument('--data_dir', default='classification_dataset')
-    parser.add_argument('--out_dir', default='results')
+    parser.add_argument('--out_dir', default='reports/evaluation')
     args = parser.parse_args()
     evaluate(args.model_path, args.data_dir, args.out_dir)

@@ -18,7 +18,7 @@ train_dir = BASE / 'train'
 valid_dir = BASE / 'valid'
 test_dir = BASE / 'test'
 
-out_dir = Path('results_dummy')
+out_dir = Path('reports/results_dummy')
 out_dir.mkdir(exist_ok=True)
 
 # Utility: gather image paths and labels
@@ -184,8 +184,9 @@ report_lines.append('## Notes')
 report_lines.append('- RandomForest trained on simple color histogram features; results are a lower-bound baseline.')
 report_lines.append('- Simulated improvements are illustrative: actual CNN/transfer results must be obtained by training real models.')
 
-with open('model_comparison_report_filled.md','w') as f:
+filled_report_path = Path('reports/model_comparison_report_filled.md')
+with open(filled_report_path,'w') as f:
     f.write('\n'.join(report_lines))
 
 print('Saved baseline reports to', out_dir)
-print('Wrote filled comparison to model_comparison_report_filled.md')
+print('Wrote filled comparison to', filled_report_path)
