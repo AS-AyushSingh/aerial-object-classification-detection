@@ -8,6 +8,7 @@ Usage examples from project root:
 import argparse
 import sys
 import os
+import numpy as np
 
 try:
     import tensorflow as tf
@@ -44,7 +45,8 @@ def build_transfer_model(input_shape=(224,224,3), num_classes=2):
     inputs = keras.Input(shape=input_shape)
     x = layers.RandomFlip('horizontal')(inputs)
     x = layers.RandomRotation(0.1)(x)
-    x = layers.Rescaling(1./255)(x)
+    # Equivalent to MobileNetV2 preprocess_input for [0,255] inputs.
+    x = layers.Rescaling(1./127.5, offset=-1)(x)
     x = base(x, training=False)
     x = layers.GlobalAveragePooling2D()(x)
     x = layers.Dropout(0.4)(x)
@@ -54,6 +56,7 @@ def build_transfer_model(input_shape=(224,224,3), num_classes=2):
 
 
 def main(args):
+    tf.keras.utils.set_random_seed(args.seed)
     img_size = (224,224)
     batch_size = args.batch_size
     class_names = ['bird', 'drone']
@@ -73,6 +76,23 @@ def main(args):
         os.path.join(args.data_dir, 'test'),
         image_size=img_size, batch_size=batch_size, label_mode='int', class_names=class_names)
 
+    autotune = tf.data.AUTOTUNE
+    train_ds = train_ds.shuffle(1000, seed=args.seed).cache().prefetch(autotune)
+    val_ds = val_ds.cache().prefetch(autotune)
+    test_ds = test_ds.cache().prefetch(autotune)
+
+    train_counts = {
+        'bird': len(tf.io.gfile.glob(os.path.join(args.data_dir, 'train', 'bird', '*'))),
+        'drone': len(tf.io.gfile.glob(os.path.join(args.data_dir, 'train', 'drone', '*'))),
+    }
+    print('Train class counts:', train_counts)
+    total_train = max(1, train_counts['bird'] + train_counts['drone'])
+    class_weight = {
+        0: total_train / (2.0 * max(1, train_counts['bird'])),
+        1: total_train / (2.0 * max(1, train_counts['drone'])),
+    }
+    print('Using class_weight:', class_weight)
+
     if args.model == 'custom':
         model = build_custom_cnn(input_shape=img_size+(3,))
         out_name = os.path.join(args.out_dir, 'best_custom_cnn.h5')
@@ -84,15 +104,47 @@ def main(args):
 
     os.makedirs(args.out_dir, exist_ok=True)
 
-    model.compile(optimizer=keras.optimizers.Adam(lr), loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+    model.compile(
+        optimizer=keras.optimizers.Adam(lr),
+        loss=keras.losses.SparseCategoricalCrossentropy(),
+        metrics=['accuracy', keras.metrics.SparseTopKCategoricalAccuracy(k=2, name='top2_acc')],
+    )
     model.summary()
 
     callbacks = [
-        keras.callbacks.EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True),
+        keras.callbacks.EarlyStopping(monitor='val_loss', patience=7, restore_best_weights=True),
+        keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6),
         keras.callbacks.ModelCheckpoint(out_name, save_best_only=True)
     ]
 
-    model.fit(train_ds, validation_data=val_ds, epochs=args.epochs, callbacks=callbacks)
+    model.fit(
+        train_ds,
+        validation_data=val_ds,
+        epochs=args.epochs,
+        callbacks=callbacks,
+        class_weight=class_weight,
+    )
+
+    if args.model == 'transfer' and args.fine_tune_epochs > 0:
+        print('Starting fine-tuning stage...')
+        base_model = model.get_layer('mobilenetv2_1.00_224')
+        base_model.trainable = True
+        for layer in base_model.layers[:-args.fine_tune_last_n]:
+            layer.trainable = False
+
+        model.compile(
+            optimizer=keras.optimizers.Adam(args.fine_tune_lr),
+            loss=keras.losses.SparseCategoricalCrossentropy(),
+            metrics=['accuracy', keras.metrics.SparseTopKCategoricalAccuracy(k=2, name='top2_acc')],
+        )
+        model.fit(
+            train_ds,
+            validation_data=val_ds,
+            epochs=args.epochs + args.fine_tune_epochs,
+            initial_epoch=args.epochs,
+            callbacks=callbacks,
+            class_weight=class_weight,
+        )
 
     print('Evaluating on test set:')
     results = model.evaluate(test_ds)
@@ -108,5 +160,9 @@ if __name__ == '__main__':
     parser.add_argument('--epochs', type=int, default=10)
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--out_dir', default='artifacts/models')
+    parser.add_argument('--seed', type=int, default=42)
+    parser.add_argument('--fine_tune_epochs', type=int, default=5)
+    parser.add_argument('--fine_tune_last_n', type=int, default=40)
+    parser.add_argument('--fine_tune_lr', type=float, default=1e-5)
     args = parser.parse_args()
     main(args)
