@@ -11,3 +11,4 @@ ultralytics  # optional, for YOLOv8 object detection
 fastapi
 uvicorn
 gunicorn 
+python-multipart
