@@ -198,7 +198,26 @@ cd backend
 jupyter notebook notebooks/Aerial_Object_Classification.ipynb
 ```
 
-## 📡 API Documentation
+## � Deployment
+
+For production deployment as a monorepo:
+
+1. **Build the frontend**:
+   ```bash
+   cd frontend
+   npm run build
+   cd ..
+   ```
+
+2. **Run the combined server**:
+   ```bash
+   cd backend
+   python api.py
+   ```
+
+The application will be available at `http://localhost:8000`, serving both the API and the frontend.
+
+## �📡 API Documentation
 
 The FastAPI server provides the following endpoints:
 
@@ -239,10 +258,12 @@ Classifies an uploaded image as bird or drone.
 
 ### Environment Variables
 
-For the frontend, create a `.env` file in the `frontend/` directory:
+For development (separate servers), create a `.env` file in the `frontend/` directory:
 ```
 VITE_API_BASE_URL=http://localhost:8000
 ```
+
+For production (monorepo), no environment variable is needed as the API is served from the same server.
 
 ### Model Configuration
 

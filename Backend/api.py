@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, UploadFile
+from fastapi.staticfiles import StaticFiles
 from PIL import Image
 import numpy as np
 import tensorflow as tf
@@ -30,13 +31,6 @@ def load_model():
 
 # Load model once at startup (faster inference)
 model, model_type = load_model()
-
-
-@app.get("/")
-async def home():
-    return {
-        "message": "Welcome to the Bird vs Drone Classifier API! Use the /predict endpoint to classify images."
-    }
 
 
 @app.post("/predict")
@@ -83,6 +77,12 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"error": f"Unexpected error during prediction: {str(e)}"}
+
+
+# Serve frontend static files
+frontend_dist = BACKEND_DIR.parent / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="frontend")
 
 
 # Render PORT fix

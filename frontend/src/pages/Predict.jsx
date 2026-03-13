@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './Predict.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/api'
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/'
 const API_ENDPOINT = `${API_BASE}/predict`
 
 function formatPercent(v) {
