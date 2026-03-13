@@ -39,6 +39,10 @@ reports/evaluation/
 *.pb
 *.h5
 
+# Keep required runtime models
+!Backend/artifacts/models/
+!Backend/artifacts/models/*.h5
+
 # Datasets (avoid pushing large data)
 classification_dataset/
 object_detection_dataset/
