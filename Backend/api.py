@@ -1,5 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 import numpy as np
 import tensorflow as tf
@@ -13,6 +14,15 @@ PRIMARY_MODEL_PATH = BACKEND_DIR / 'artifacts' / 'models' / 'best_transfer_model
 FALLBACK_MODEL_PATH = BACKEND_DIR / 'artifacts' / 'models' / 'best_custom_cnn.h5'
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 
 def load_model():
