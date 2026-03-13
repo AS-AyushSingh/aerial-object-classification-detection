@@ -14,15 +14,20 @@ app = FastAPI()
 def load_model():
     if PRIMARY_MODEL_PATH.exists():
         model = tf.keras.models.load_model(str(PRIMARY_MODEL_PATH), compile=False)
-        return model, 'transfer'
+        return model, "transfer"
 
     if FALLBACK_MODEL_PATH.exists():
         model = tf.keras.models.load_model(str(FALLBACK_MODEL_PATH), compile=False)
-        return model, 'custom'
+        return model, "custom"
 
     raise FileNotFoundError(
-        'No trained model file was found at artifacts/models/best_transfer_model.h5 or artifacts/models/best_custom_cnn.h5'
+        "No trained model file was found at artifacts/models/best_transfer_model.h5 or artifacts/models/best_custom_cnn.h5"
     )
+
+
+# Load model once at startup
+model, model_type = load_model()
+
 
 @app.get("/")
 async def home():
@@ -34,22 +39,27 @@ async def home():
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     try:
-        model, model_type = load_model()
         contents = await file.read()
-        img = Image.open(io.BytesIO(contents)).convert('RGB')
-        # Preprocess
+        img = Image.open(io.BytesIO(contents)).convert("RGB")
+
+        # Resize image
         img_resized = img.resize((224, 224))
-        # Keep pixel range as [0,255]; model contains its own normalization/preprocessing.
+
+        # Convert to numpy
         x = np.array(img_resized, dtype=np.float32)
-        x = np.expand_dims(x, 0)
+        x = np.expand_dims(x, axis=0)
+
+        # Prediction
         pred = model.predict(x, verbose=0)[0]
-        # Keep probabilities valid even if a logits model is loaded.
+
+        # Ensure probabilities
         if not np.isclose(np.sum(pred), 1.0, atol=1e-3):
             pred = tf.nn.softmax(pred).numpy()
 
+        labels = ["bird", "drone"]
         cls = int(np.argmax(pred))
         conf = float(pred[cls])
-        labels = ['bird', 'drone']
+
         sorted_probs = np.sort(pred)
         margin = float(sorted_probs[-1] - sorted_probs[-2])
 
@@ -58,16 +68,15 @@ async def predict(file: UploadFile = File(...)):
             "confidence": conf,
             "margin": margin,
             "model_type": model_type,
-            "probabilities": {label: float(prob) for label, prob in zip(labels, pred)}
+            "probabilities": {
+                label: float(prob) for label, prob in zip(labels, pred)
+            }
         }
 
         if conf < 0.80 or margin < 0.20:
             result["warning"] = "Low-confidence prediction. Try a clearer image or different angle."
 
         return result
-    except FileNotFoundError as e:
-        return {"error": str(e)}
-    except RuntimeError as e:
-        return {"error": f'Failed to load model: {e}'}
+
     except Exception as e:
-        return {"error": f'Unexpected error during prediction: {e}'}
+        return {"error": f"Unexpected error during prediction: {str(e)}"}
