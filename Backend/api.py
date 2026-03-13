@@ -4,12 +4,15 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 import io
+import os
+import uvicorn
 
 BACKEND_DIR = Path(__file__).resolve().parent
 PRIMARY_MODEL_PATH = BACKEND_DIR / 'artifacts' / 'models' / 'best_transfer_model.h5'
 FALLBACK_MODEL_PATH = BACKEND_DIR / 'artifacts' / 'models' / 'best_custom_cnn.h5'
 
 app = FastAPI()
+
 
 def load_model():
     if PRIMARY_MODEL_PATH.exists():
@@ -25,7 +28,7 @@ def load_model():
     )
 
 
-# Load model once at startup
+# Load model once at startup (faster inference)
 model, model_type = load_model()
 
 
@@ -80,3 +83,9 @@ async def predict(file: UploadFile = File(...)):
 
     except Exception as e:
         return {"error": f"Unexpected error during prediction: {str(e)}"}
+
+
+# Render PORT fix
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("api:app", host="0.0.0.0", port=port)
