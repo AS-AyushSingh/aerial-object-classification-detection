@@ -1,0 +1,228 @@
+.predict {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 34px 22px 52px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.predict__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.predict__title {
+  margin: 0;
+  font-size: 2.1rem;
+  color: var(--text-h);
+}
+
+.predict__subtitle {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(230, 232, 245, 0.82);
+}
+
+.predict__upload {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.predict__upload--drag {
+  border-color: rgba(0, 245, 255, 0.7);
+  background: rgba(0, 245, 255, 0.08);
+}
+
+.predict__uploadLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  cursor: pointer;
+}
+
+.predict__uploadPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(230, 232, 245, 0.78);
+  text-align: center;
+}
+
+.predict__uploadIcon {
+  font-size: 2rem;
+}
+
+.predict__uploadText {
+  font-size: 0.9rem;
+}
+
+.predict__uploadText strong {
+  color: rgba(238, 242, 255, 0.94);
+}
+
+.predict__preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.predict__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.button {
+  padding: 12px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent-cyan), rgba(0, 245, 255, 0.8));
+  color: rgba(12, 13, 18, 0.98);
+  transition: transform 0.16s ease, filter 0.16s ease;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button--ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(230, 232, 245, 0.88);
+}
+
+.predict__error {
+  margin: 0;
+  color: rgba(255, 130, 130, 0.9);
+  background: rgba(255, 80, 80, 0.14);
+  border: 1px solid rgba(255, 80, 80, 0.3);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.92rem;
+}
+
+.predict__scores {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+.predict__sectionTitle {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  color: var(--text-h);
+  text-align: center;
+}
+
+.predict__resultCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 20px;
+}
+
+.predict__resultItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.predict__resultLabel {
+  font-size: 0.9rem;
+  color: rgba(230, 232, 245, 0.8);
+  font-weight: 600;
+}
+
+.predict__resultValue {
+  font-size: 1.1rem;
+  color: var(--text-h);
+  font-weight: 700;
+}
+
+.predict__probabilities {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.predict__probabilitiesTitle {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.predict__probability {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.predict__probabilityHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.predict__probabilityLabel {
+  font-size: 0.9rem;
+  color: rgba(230, 232, 245, 0.85);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.predict__probabilityValue {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: rgba(230, 232, 245, 0.9);
+  font-size: 0.9rem;
+}
+
+.predict__probabilityBar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.predict__probabilityFill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s ease-out;
+}
+
+.predict__probabilityFill--bird {
+  background: linear-gradient(90deg, rgba(255, 123, 23, 0.8), rgba(255, 123, 23, 1));
+}
+
+.predict__probabilityFill--drone {
+  background: linear-gradient(90deg, rgba(0, 245, 255, 0.8), rgba(0, 245, 255, 1));
+}
