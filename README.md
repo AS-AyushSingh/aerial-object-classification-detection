@@ -8,27 +8,16 @@ Internship project for two tasks:
 
 ```
 Aerial Object Classification & Detection/
-├─ notebooks/
-│  └─ Aerial_Object_Classification.ipynb
-├─ scripts/
-│  ├─ train_classification.py
-│  ├─ evaluate_model.py
-│  └─ dummy_classification_baseline.py
-├─ artifacts/
-│  └─ models/
-├─ reports/
-│  ├─ model_comparison_report.md
-│  ├─ model_comparison_report_filled.md
-│  └─ results_dummy/
-├─ classification_dataset/
-├─ object_detection_dataset/
-│  └─ data.yaml
-├─ docs/
-│  └─ dataset_sources/
-├─ archive/
-│  ├─ legacy_notebooks/
-│  └─ legacy_scripts/
-├─ app.py
+├─ Backend/
+│  ├─ notebooks/
+│  ├─ scripts/
+│  ├─ artifacts/
+│  ├─ reports/
+│  ├─ classification_dataset/
+│  ├─ object_detection_dataset/
+│  ├─ docs/
+│  ├─ archive/
+│  └─ app.py
 ├─ requirements.txt
 └─ requirements-lock.txt
 ```
@@ -47,39 +36,39 @@ python -m pip install -r requirements.txt
 2. Run notebook workflow:
 
 ```powershell
-code notebooks/Aerial_Object_Classification.ipynb
+code Backend/notebooks/Aerial_Object_Classification.ipynb
 ```
 
 3. Train a classification model:
 
 ```powershell
-python scripts/train_classification.py --model custom --epochs 10
+python Backend/scripts/train_classification.py --model custom --epochs 10
 ```
 
 4. Evaluate a saved model:
 
 ```powershell
-python scripts/evaluate_model.py --model_path artifacts/models/best_custom_cnn.h5
+python Backend/scripts/evaluate_model.py --model_path artifacts/models/best_custom_cnn.h5
 ```
 
 5. Start Streamlit app:
 
 ```powershell
-streamlit run app.py
+streamlit run Backend/app.py
 ```
 
 ## How Components Connect
 
-- `classification_dataset/` is the source for training and evaluation.
-- `scripts/train_classification.py` reads `classification_dataset/` and writes `.h5` models to `artifacts/models/`.
-- `scripts/evaluate_model.py` loads a model from `artifacts/models/`, evaluates on test data, and writes metrics/plots to `reports/evaluation/`.
-- `app.py` loads the trained model and serves image predictions via Streamlit.
-- `reports/` stores generated analysis outputs and comparison documents.
-- `object_detection_dataset/` (with `object_detection_dataset/data.yaml`) supports optional YOLO training.
+- `Backend/classification_dataset/` is the source for training and evaluation.
+- `Backend/scripts/train_classification.py` reads `classification_dataset/` and writes `.h5` models to `Backend/artifacts/models/`.
+- `Backend/scripts/evaluate_model.py` loads a model from `artifacts/models/`, evaluates on test data, and writes metrics/plots to `Backend/reports/evaluation/`.
+- `Backend/app.py` loads the trained model and serves image predictions via Streamlit.
+- `Backend/reports/` stores generated analysis outputs and comparison documents.
+- `Backend/object_detection_dataset/` (with `Backend/object_detection_dataset/data.yaml`) supports optional YOLO training.
 
 ## Notes
 
-- Legacy experiments were moved to `archive/` to keep the root clean.
-- Source dataset readme files are in `docs/dataset_sources/`.
+- Legacy experiments were moved to `Backend/archive/` to keep the root clean.
+- Source dataset readme files are in `Backend/docs/dataset_sources/`.
 - The environment used by this editor may not allow pip installs; if package installs fail, run the install commands locally on your machine.
 - The notebook cells include guards that skip TF-dependent code if TensorFlow is not present — this allows inspection and visualization to run even when heavy packages are missing.
