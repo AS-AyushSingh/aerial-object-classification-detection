@@ -13,13 +13,16 @@ app = FastAPI()
 
 def load_model():
     if PRIMARY_MODEL_PATH.exists():
-        model = tf.keras.models.load_model(str(PRIMARY_MODEL_PATH))
+        model = tf.keras.models.load_model(str(PRIMARY_MODEL_PATH), compile=False)
         return model, 'transfer'
-    if FALLBACK_MODEL_PATH.exists():
-        model = tf.keras.models.load_model(str(FALLBACK_MODEL_PATH))
-        return model, 'custom'
-    raise FileNotFoundError('No trained model file was found at artifacts/models/best_transfer_model.h5 or artifacts/models/best_custom_cnn.h5')
 
+    if FALLBACK_MODEL_PATH.exists():
+        model = tf.keras.models.load_model(str(FALLBACK_MODEL_PATH), compile=False)
+        return model, 'custom'
+
+    raise FileNotFoundError(
+        'No trained model file was found at artifacts/models/best_transfer_model.h5 or artifacts/models/best_custom_cnn.h5'
+    )
 
 @app.get("/")
 async def home():
