@@ -42,10 +42,16 @@ reports/evaluation/
 # Keep required runtime models
 !Backend/artifacts/models/
 !Backend/artifacts/models/*.h5
+!Backend/artifacts/
+!Backend/artifacts/**
 
 # Datasets (avoid pushing large data)
-classification_dataset/
-object_detection_dataset/
+/classification_dataset/
+/object_detection_dataset/
+!Backend/classification_dataset/
+!Backend/classification_dataset/**
+!Backend/object_detection_dataset/
+!Backend/object_detection_dataset/**
 
 # YOLO/Ultralytics cache
 runs/

@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './Predict.css'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '/'
-const API_ENDPOINT = `${API_BASE}/predict`
+function buildApiEndpoint() {
+  const configuredBase = import.meta.env.VITE_API_BASE_URL?.trim()
+  const base = configuredBase && configuredBase.length > 0 ? configuredBase : '/api'
+  return `${base.replace(/\/$/, '')}/predict`
+}
+
+const API_ENDPOINT = buildApiEndpoint()
 
 function formatPercent(v) {
   return `${Math.round(v * 100)}%`
